@@ -58,7 +58,15 @@ namespace NancyBoilerplate.Web.Modules
 
         private dynamic Get_UserDelete(Guid uniqueId)
         {
-            return "delete" + uniqueId.ToString();
+            User user = _session.Query<User>().Where(u => u.UniqueId == uniqueId).FirstOrDefault();
+            
+            if (user != null && !user.HasClaim("administrator")) 
+            {
+                _session.Delete(user);
+                _session.SaveChanges();
+            }
+
+            return Response.AsRedirect("~/admin/users");
         }
 
         private object Get_Admin(object arg)
@@ -82,6 +90,14 @@ namespace NancyBoilerplate.Web.Modules
             public string Email { get; set; }
             public string Password { get; set; }
             public float Amount { get; set; }
+        }
+    }
+
+    public static class Extensions
+    {
+        public static string GetX(this User user)
+        {
+            return user.ToString();
         }
     }
 }

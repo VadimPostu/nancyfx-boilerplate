@@ -1,4 +1,5 @@
-﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<NancyBoilerplate.Web.Modules.AdminModule.UsersListViewModel>
+﻿@using Nancy.Security
+@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<NancyBoilerplate.Web.Modules.AdminModule.UsersListViewModel>
 @{
     Layout = "_Layout";
 }
@@ -26,7 +27,10 @@
         <td>@user.Amount</td>
         <td>
             <a href="@Url.Content("~/admin/users/" + user.UniqueId)">edit</a>
-            <a href="@Url.Content("~/admin/users/" + user.UniqueId + "/delete")">delete</a>
+            @if (!user.HasClaim("administrator"))
+            {
+                <a href="@Url.Content("~/admin/users/" + user.UniqueId + "/delete")">delete</a>
+            }
         </td>
     </tr>
 }
