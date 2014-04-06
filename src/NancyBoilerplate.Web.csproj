@@ -80,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\User\TransactionListView.cshtml" />
+    <Content Include="Views\User\ChangePasswordView.cshtml" />
     <None Include="Views\User\_Layout.cshtml" />
     <Content Include="Web.config" />
   </ItemGroup>
