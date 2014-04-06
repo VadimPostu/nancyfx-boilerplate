@@ -23,7 +23,7 @@ namespace NancyBoilerplate.Web.Modules
 
         private object Get_CreateNewUser(object arg)
         {
-            var user = _userMapper.CreateUser("Admin", "d.postu@gmail.com", "password", new[] {"user", "administrator"});
+            var user = _userMapper.CreateUser("Admin", "vadim.postu@gmail.com", "password", new[] {"user", "administrator"});
 
             return Response.AsJson(user);
         }
