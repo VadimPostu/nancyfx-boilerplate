@@ -1,0 +1,17 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+    <body>
+        
+        <form method="POST">
+            <input type="text" name="userName" placeholder="username" value="@Model.UserName"/>
+            <input type="password" name="password" placeholder="password" value="@Model.Password"/>
+            <input type="submit" value="Sign in"/>
+        </form>
+
+    </body>
+</html>
