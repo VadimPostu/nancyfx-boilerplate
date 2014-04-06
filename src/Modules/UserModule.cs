@@ -88,27 +88,18 @@ namespace NancyBoilerplate.Web.Modules
 
             User user = _session.Query<User>().Where(u => u.UniqueId == uniqueId).FirstOrDefault();
 
-            if (viewModel.NewPassword != null)
+            viewModel.CurrentPasswordHasError = user.Password != _userMapper.CreateHash(viewModel.CurrentPassword);
+            viewModel.RepeatPasswordHasError = viewModel.NewPassword != viewModel.RepeatPassword;
+            viewModel.NewPasswordHasError = viewModel.NewPassword == null;
+
+            if (viewModel.CurrentPasswordHasError || viewModel.RepeatPasswordHasError || viewModel.NewPasswordHasError)
             {
-                if (user.Password != _userMapper.CreateHash(viewModel.CurrentPassword))
-                {
-                    viewModel.CurrentPasswordHasError = true;
-                    return View[viewModel];
-                }
-                if (viewModel.NewPassword != viewModel.RepeatPassword)
-                {
-                    viewModel.CurrentPasswordHasError = true;
-                    return View[viewModel];
-                }
-
-
-                user.Password = _userMapper.CreateHash(viewModel.NewPassword);
-                _session.SaveChanges();
-                return Response.AsRedirect("~/user");
+                return View[viewModel];
             }
-            
-            viewModel.NewPasswordHasError = true;
-            return View[viewModel];
+
+            user.Password = _userMapper.CreateHash(viewModel.NewPassword);
+            _session.SaveChanges();
+            return Response.AsRedirect("~/user");
         }
 
         private dynamic Get_ChangePassword(dynamic arg)

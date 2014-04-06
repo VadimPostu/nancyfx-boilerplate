@@ -105,12 +105,21 @@ namespace NancyBoilerplate.Web.Modules
             var viewModel = this.Bind<AddOrEditUserViewModel>();
             User user = _session.Query<User>().Where(u => u.UniqueId == uniqueId).FirstOrDefault();
 
+
+            if (viewModel.Amount < 0 ||
+             _session.Query<User>().Where(u => (u.Email == viewModel.Email && u.UniqueId != user.UniqueId)).FirstOrDefault() != null ||
+             _session.Query<User>().Where(u => (u.UserName == viewModel.UserName && u.UniqueId != user.UniqueId)).FirstOrDefault() != null)
+            {
+                viewModel.IsErrorInForm = true;
+                return View[viewModel];
+            }
+
             user.Amount = viewModel.Amount;
             user.Email = viewModel.Email;
             user.UserName = viewModel.UserName;
             if (!String.IsNullOrEmpty(viewModel.Password))
             {
-                user.Password =  _userMapper.CreateHash(viewModel.Password);
+                user.Password = _userMapper.CreateHash(viewModel.Password);
             }
 
             _session.SaveChanges();
