@@ -38,7 +38,7 @@ namespace NancyBoilerplate.Web.Core
             return user;
         }
 
-        private string CreateHash(string password)
+        public string CreateHash(string password)
         {
             var crypt = new SHA256Managed();
             var hash = String.Empty;

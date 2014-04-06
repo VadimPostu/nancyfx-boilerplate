@@ -1,0 +1,15 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<NancyBoilerplate.Web.Modules.AdminModule.AddOrEditUserViewModel>
+@{
+    Layout = "_Layout";
+}
+
+<form method="post">
+    <input type="text" placeholder="username" name="UserName" value="@Model.UserName" required/> <br />
+    <input type="email" placeholder="email" name="Email" value="@Model.Email" required/> <br />
+    <input type="password" placeholder="password" name="Password" @(Model.User == null ? "required" : "" )/> <br />
+    <input type="number" placeholder="0" name="Amount" value="@Model.Amount" required/> <br />
+
+    <input type="submit" />
+</form>
+
+       

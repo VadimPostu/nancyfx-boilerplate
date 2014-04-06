@@ -95,7 +95,7 @@
     <Content Include="Views\signin.cshtml" />
     <Content Include="Views\Admin\UsersListView.cshtml" />
     <Content Include="Views\Admin\_Layout.cshtml" />
-    <Content Include="Views\Admin\AddUserView.cshtml" />
+    <Content Include="Views\Admin\AddOrEditUserView.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
