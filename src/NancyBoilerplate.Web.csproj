@@ -93,6 +93,9 @@
   <ItemGroup>
     <Content Include="packages.config" />
     <Content Include="Views\signin.cshtml" />
+    <Content Include="Views\Admin\UsersListView.cshtml" />
+    <Content Include="Views\Admin\_Layout.cshtml" />
+    <Content Include="Views\Admin\AddUserView.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

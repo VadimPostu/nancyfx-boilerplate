@@ -1,0 +1,16 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Administration panel</title>
+</head>
+<body>
+    <a href="@Url.Content("~/admin/users/")">Users list</a>
+    <a href="@Url.Content("~/admin/users/add")">Add user</a>
+    <hr />
+
+    @RenderBody()
+
+</body>
+</html>

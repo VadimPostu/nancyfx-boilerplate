@@ -47,7 +47,7 @@ namespace NancyBoilerplate.Web.Core
             return crypto.Aggregate(hash, (current, bit) => current + bit.ToString("x2"));
         }
 
-        public User CreateUser(string username, string email, string password, string[] claims)
+        public User CreateUser(string username, string email, string password, float amount, string[] claims)
         {
             var user = new User()
                 {
@@ -55,6 +55,7 @@ namespace NancyBoilerplate.Web.Core
                     UserName = username,
                     Email = email,
                     Password = CreateHash(password),
+                    Amount = amount,
                     Claims = claims
                 };
 

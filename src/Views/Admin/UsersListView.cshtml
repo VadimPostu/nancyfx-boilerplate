@@ -1,0 +1,35 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<NancyBoilerplate.Web.Modules.AdminModule.UsersListViewModel>
+@{
+    Layout = "_Layout";
+}
+
+<table>
+    <tr>
+        <td>
+            Username
+        </td>
+        <td>
+            Email
+        </td>
+        <td>
+            Amount
+        </td>
+        <td>
+            Actions
+        </td>
+    </tr>
+@foreach (var user in Model.Users)
+{
+    <tr>
+        <td>@user.UserName</td>
+        <td>@user.Email</td>
+        <td>@user.Amount</td>
+        <td>
+            <a href="@Url.Content("~/admin/users/" + user.UniqueId)">edit</a>
+            <a href="@Url.Content("~/admin/users/" + user.UniqueId + "/delete")">delete</a>
+        </td>
+    </tr>
+}
+
+    
+</table>   

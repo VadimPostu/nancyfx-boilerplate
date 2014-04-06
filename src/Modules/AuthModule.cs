@@ -16,16 +16,8 @@ namespace NancyBoilerplate.Web.Modules
         {
             _userMapper = userMapper;
 
-            Get["/newuser"] = Get_CreateNewUser;
             Get["/signin"] = _ => View["signin", new SignInViewModel()];
             Post["/signin"] = Post_SignIn;
-        }
-
-        private object Get_CreateNewUser(object arg)
-        {
-            var user = _userMapper.CreateUser("Admin", "vadim.postu@gmail.com", "password", new[] {"user", "administrator"});
-
-            return Response.AsJson(user);
         }
 
         private object Post_SignIn(object arg)

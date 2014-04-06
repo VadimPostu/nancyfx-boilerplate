@@ -11,6 +11,7 @@ namespace NancyBoilerplate.Web.Entities
         public string UserName { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
+        public float Amount { get; set; }
 
         public IEnumerable<string> Claims { get; set; }
     }
