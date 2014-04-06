@@ -6,6 +6,7 @@ using Raven.Client;
 using System;
 using System.Linq;
 using NancyBoilerplate.Web.Core;
+using System.Collections.Generic;
 
 namespace NancyBoilerplate.Web.Modules
 {
@@ -28,29 +29,61 @@ namespace NancyBoilerplate.Web.Modules
             Get["/users/add"] = Get_UsersAdd;
             Post["/users/add"] = Post_UsersAdd;
 
+            Get["/users/view/{uniqueId}"] = args => Get_UsersTransactions(args.uniqueId);
+            Get["/users/transactions"] = Get_Transactions;
+
             Get["/users/{uniqueId}"] = args => Get_UserEdit(args.uniqueId);
             Post["/users/{uniqueId}"] = args => Post_UserEdit(args.uniqueId);
 
             Get["/users/{uniqueId}/delete"] = args => Get_UserDelete(args.uniqueId);
         }
 
+        private dynamic Get_Transactions(dynamic arg)
+        {
+            var transaction = _session.Query<Transaction>().
+                Customize(q => q.WaitForNonStaleResults()).
+                ToArray();
+
+            return View[new NancyBoilerplate.Web.Modules.UserModule.TransactionListViewModel(transaction)];
+        }
+
+        private dynamic Get_UsersTransactions(Guid uniqueId)
+        {
+            var transaction = _session.Query<Transaction>().
+                Customize(q => q.WaitForNonStaleResults()).
+                Where(t => t.Receiver.UniqueId == uniqueId || t.Sender.UniqueId == uniqueId).
+                ToArray();
+
+            return View[new NancyBoilerplate.Web.Modules.UserModule.TransactionListViewModel(transaction)];
+        }
+
         private dynamic Post_UsersAdd(dynamic arg)
         {
             var viewModel = this.Bind<AddOrEditUserViewModel>();
-            var existingUserWithSameEmail = _session.Query<User>().Where(u => u.Email == viewModel.Email);
-            var existingUserWithSameUserName = _session.Query<User>().Where(u => u.UserName == viewModel.UserName);
-            if (!String.IsNullOrEmpty(viewModel.UserName))
+
+            if (string.IsNullOrEmpty(viewModel.UserName) || string.IsNullOrEmpty(viewModel.Password))
             {
-                String [] claim = { "user" };
-                if (viewModel.AdminClaim) claim = new [] { "user", "administrator" };
+                viewModel.IsErrorInForm = true;
+                return View[viewModel];
+            }
+            
+            var existingUserWithSameEmail = _session.Query<User>().Where(u => u.Email == viewModel.Email).FirstOrDefault();
+            var existingUserWithSameUserName = _session.Query<User>().Where(u => u.UserName == viewModel.UserName).FirstOrDefault();
 
-
-                var user = _userMapper.CreateUser(viewModel.UserName, viewModel.Email, viewModel.Password, viewModel.Amount, claim);
-                return Response.AsRedirect("~/admin/users");
+            if (existingUserWithSameEmail != null || existingUserWithSameUserName != null)
+            {
+                viewModel.IsErrorInForm = true;
+                return View[viewModel];
             }
 
-            viewModel.IsErrorInForm = true;
-            return View[viewModel];
+            List<string> claims = new List<string> { "user" };
+            if (viewModel.Claim == "adminClaim")
+            {
+                claims.Add("administrator");
+            }
+
+            var user = _userMapper.CreateUser(viewModel.UserName, viewModel.Email, viewModel.Password, viewModel.Amount, claims.ToArray());
+            return Response.AsRedirect("~/admin/users");
         }
 
         private dynamic Get_UsersAdd(dynamic arg)
@@ -143,10 +176,10 @@ namespace NancyBoilerplate.Web.Modules
             public string Password { get; set; }
             public float Amount { get; set; }
 
-            public bool UserClaim { get; set; }
-            public bool AdminClaim { get; set; }
+            public String Claim { get; set; }
 
             public bool IsErrorInForm { get; set; }
         }
+
     }
 }

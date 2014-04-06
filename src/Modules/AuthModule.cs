@@ -37,7 +37,7 @@ namespace NancyBoilerplate.Web.Modules
             {
                 return View["signin", signInRequest];
             }
-            if(user.HasClaim("administrator")) redirectUrl = "~/admin";
+            if(user.HasClaim("administrator")) redirectUrl = "~/admin/users";
             else redirectUrl = "~/user";
 
             return this.Login(user.UniqueId, DateTime.Now.AddDays(CookieLifeSpanInDays), redirectUrl);

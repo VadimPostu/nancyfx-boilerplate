@@ -1,5 +1,9 @@
 ﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
 
+@{
+    var currentUser = RenderContext.Context.CurrentUser as NancyBoilerplate.Web.Entities.User;
+}
+
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -10,6 +14,9 @@
     <a href="@Url.Content("~/user/changePassword")">Change password</a>
     <a href="@Url.Content("~/user/transaction")">Execute transaction</a>
     <a href="@Url.Content("~/signout")">Log Out</a>
+
+    <span>  Your Amount: @currentUser.Amount</span>
+
     <hr />
 
     @RenderBody()

@@ -4,15 +4,17 @@
 }
 
 <form method="post">
+    @if(@Model.IsErrorInForm){<span style="color:red">There is a error in the form</span><br />}
     <input type="text" placeholder="username" name="UserName" value="@Model.UserName" required/> <br />
     <input type="email" placeholder="email" name="Email" value="@Model.Email" required/> <br />
     <input type="password" placeholder="password" name="Password" @(Model.User == null ? "required" : "" )/> <br />
     <input type="number" placeholder="0" name="Amount" value="@Model.Amount" required/> <br />
 
-    <label>Account Type:  User:</label>
-        <input type="radio" group="claim" name="UserClaim" @Model.UserClaim/>
-    <label>  Admin:</label>
-        <input type="radio" group="claim" name="AdminClaim" @Model.AdminClaim/>
+    Account Type:
+    <label for="claimUser">  User:</label>
+        <input type="radio" value="UserClaim" id="claimUser" name="Claim" @(Model.User == null ? "checked" : "" )/>
+    <label for="claimAdmin">  Admin:</label>
+        <input type="radio" value="AdminClaim" id="claimAdmin" name="Claim"/>
 
     <input type="submit" />
 </form>

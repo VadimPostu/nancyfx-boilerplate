@@ -16,7 +16,7 @@ namespace NancyBoilerplate.Web.Modules
                 return Response.AsRedirect("~/signin");
             
             if(Context.CurrentUser.HasClaim("administrator"))
-                return Response.AsRedirect("~/admin");
+                return Response.AsRedirect("~/admin/users");
 
             return Response.AsRedirect("~/user");
         }
