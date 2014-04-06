@@ -9,6 +9,11 @@
     <input type="password" placeholder="password" name="Password" @(Model.User == null ? "required" : "" )/> <br />
     <input type="number" placeholder="0" name="Amount" value="@Model.Amount" required/> <br />
 
+    <label>Account Type:  User:</label>
+        <input type="radio" group="claim" name="UserClaim" @Model.UserClaim/>
+    <label>  Admin:</label>
+        <input type="radio" group="claim" name="AdminClaim" @Model.AdminClaim/>
+
     <input type="submit" />
 </form>
 

@@ -8,15 +8,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using NancyBoilerplate.Web.Core;
+using Raven.Abstractions.Exceptions;
+using System.Threading;
 
 namespace NancyBoilerplate.Web.Modules
 {
     public class UserModule : NancyModule
     {
-        const String PasswordWrong = "Your password is invalid";
-        const String PasswordsDontMatch = "The passwords you introduced don't match";
-        const String PasswordNull = "New Password Null";
-
         private readonly IDocumentSession _session;
 
         private readonly UserMapper _userMapper;
@@ -40,14 +38,47 @@ namespace NancyBoilerplate.Web.Modules
 
         }
 
-        private dynamic Post_ExecuteTransaction(dynamic arg)
-        {
-            throw new NotImplementedException();
-        }
-
         private dynamic Get_ExecuteTransaction(dynamic arg)
         {
-            throw new NotImplementedException();
+            return View[new TransactionViewModel()];
+        }
+
+        private dynamic Post_ExecuteTransaction(dynamic arg)
+        {
+            _session.Advanced.UseOptimisticConcurrency = true;
+
+            Guid uniqueId = (Context.CurrentUser as User).UniqueId;
+            var viewModel = this.Bind<TransactionViewModel>();
+
+            User user = _session.Query<User>().Where(u => u.UniqueId == uniqueId).FirstOrDefault();
+            User receiverUser = _session.Query<User>().Where(u => u.Email == viewModel.Email).FirstOrDefault();
+
+            viewModel.AmountInvalid = viewModel.Amount <= 0;
+            viewModel.NotEnoughMoney = viewModel.Amount > user.Amount;
+            viewModel.EmailHasError = receiverUser == null;
+
+            if (viewModel.AmountInvalid || viewModel.NotEnoughMoney || viewModel.EmailHasError)
+            {
+                return View[viewModel];
+            }
+
+            receiverUser.Amount += viewModel.Amount;
+            user.Amount -= viewModel.Amount;
+
+            var transaction = new Transaction(user, receiverUser, viewModel.Amount);
+            _session.Store(transaction);
+
+            try
+            {
+                _session.SaveChanges();
+            }
+            catch (ConcurrencyException ex)
+            {
+                viewModel.TransactionFailed = true;
+                return View[viewModel];
+            }
+
+            return Response.AsRedirect("~/user");
         }
 
         private dynamic Post_ChangePassword(dynamic arg)
@@ -61,12 +92,12 @@ namespace NancyBoilerplate.Web.Modules
             {
                 if (user.Password != _userMapper.CreateHash(viewModel.CurrentPassword))
                 {
-                    viewModel.CurrentPasswordError = PasswordWrong;
+                    viewModel.CurrentPasswordHasError = true;
                     return View[viewModel];
                 }
                 if (viewModel.NewPassword != viewModel.RepeatPassword)
                 {
-                    viewModel.CurrentPasswordError = PasswordsDontMatch;
+                    viewModel.CurrentPasswordHasError = true;
                     return View[viewModel];
                 }
 
@@ -76,7 +107,7 @@ namespace NancyBoilerplate.Web.Modules
                 return Response.AsRedirect("~/user");
             }
             
-            viewModel.NewPasswordError = PasswordNull;
+            viewModel.NewPasswordHasError = true;
             return View[viewModel];
         }
 
@@ -113,9 +144,20 @@ namespace NancyBoilerplate.Web.Modules
             public string NewPassword { get; set; }
             public string RepeatPassword { get; set; }
 
-            public string CurrentPasswordError { get; set; }
-            public string RepeatPasswordError { get; set; }
-            public string NewPasswordError { get; set; }
+            public bool CurrentPasswordHasError { get; set; }
+            public bool RepeatPasswordHasError { get; set; }
+            public bool NewPasswordHasError { get; set; }
+        }
+
+        public class TransactionViewModel
+        {
+            public string Email { get; set; }
+            public float Amount { get; set; }
+
+            public bool EmailHasError { get; set; }
+            public bool NotEnoughMoney { get; set; }
+            public bool AmountInvalid { get; set; }
+            public bool TransactionFailed { get; set; }
         }
 
     }

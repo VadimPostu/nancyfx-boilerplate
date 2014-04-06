@@ -37,9 +37,20 @@ namespace NancyBoilerplate.Web.Modules
         private dynamic Post_UsersAdd(dynamic arg)
         {
             var viewModel = this.Bind<AddOrEditUserViewModel>();
-            var user = _userMapper.CreateUser(viewModel.UserName, viewModel.Email, viewModel.Password, viewModel.Amount, new[] { "user" });
+            var existingUserWithSameEmail = _session.Query<User>().Where(u => u.Email == viewModel.Email);
+            var existingUserWithSameUserName = _session.Query<User>().Where(u => u.UserName == viewModel.UserName);
+            if (!String.IsNullOrEmpty(viewModel.UserName))
+            {
+                String [] claim = { "user" };
+                if (viewModel.AdminClaim) claim = new [] { "user", "administrator" };
 
-            return Response.AsRedirect("~/admin/users");
+
+                var user = _userMapper.CreateUser(viewModel.UserName, viewModel.Email, viewModel.Password, viewModel.Amount, claim);
+                return Response.AsRedirect("~/admin/users");
+            }
+
+            viewModel.IsErrorInForm = true;
+            return View[viewModel];
         }
 
         private dynamic Get_UsersAdd(dynamic arg)
@@ -131,6 +142,11 @@ namespace NancyBoilerplate.Web.Modules
             public string Email { get; set; }
             public string Password { get; set; }
             public float Amount { get; set; }
+
+            public bool UserClaim { get; set; }
+            public bool AdminClaim { get; set; }
+
+            public bool IsErrorInForm { get; set; }
         }
     }
 }

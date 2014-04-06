@@ -15,6 +15,10 @@ namespace NancyBoilerplate.Web.Entities
         public float Amount { get; set; }
         public DateTime Date { get; set; }
 
+        public Transaction()
+        {
+        }
+
         public Transaction(User from, User to, float amount)
         {
             Sender = new TransactionParty(from);
@@ -28,6 +32,10 @@ namespace NancyBoilerplate.Web.Entities
     {
         public Guid UniqueId { get; set; }
         public string Email { get; set; }
+
+        public TransactionParty()
+        {
+        }
 
         public TransactionParty(User user)
         {
