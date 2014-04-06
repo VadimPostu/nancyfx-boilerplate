@@ -1,4 +1,5 @@
 ﻿using Nancy;
+using Nancy.Security;
 
 namespace NancyBoilerplate.Web.Modules
 {
@@ -9,9 +10,15 @@ namespace NancyBoilerplate.Web.Modules
             Get["/"] = Get_Index;
         }
 
-        private object Get_Index(object arg)
+        private dynamic Get_Index(object arg)
         {
-            return Response.AsJson(Context.CurrentUser);
+            if (Context.CurrentUser == null)
+                return Response.AsRedirect("~/signin");
+            
+            if(Context.CurrentUser.HasClaim("administrator"))
+                return Response.AsRedirect("~/admin");
+
+            return Response.AsRedirect("~/user");
         }
     }
 }
