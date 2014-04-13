@@ -1,21 +1,14 @@
 ﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
 
-@{
-    var currentUser = RenderContext.Context.CurrentUser as NancyBoilerplate.Web.Entities.User;
-}
-
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>User panel</title>
 </head>
 <body>
-    <a href="@Url.Content("~/user")">Transaction list</a>
+    <a href="@Url.Content("~/user/books")">Book list</a>
     <a href="@Url.Content("~/user/changePassword")">Change password</a>
-    <a href="@Url.Content("~/user/transaction")">Execute transaction</a>
     <a href="@Url.Content("~/signout")">Log Out</a>
-
-    <span>  Your Amount: @currentUser.Amount</span>
 
     <hr />
 

@@ -1,0 +1,52 @@
+﻿@using Nancy.Security
+@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<NancyBoilerplate.Web.Modules.UserModule.BookListViewModel>
+@{
+    Layout = "_Layout";
+}
+@{
+    var currentUser = RenderContext.Context.CurrentUser as NancyBoilerplate.Web.Entities.User;
+}
+
+<table>
+    <tr>
+        <td>
+            Title
+        </td>
+        <td>
+            Author
+        </td>
+        <td>
+            Genre
+        </td>
+        <td>
+            Quantity
+        </td>
+        <td>
+            Price
+        </td>
+    </tr>
+@foreach (var book in Model.Book)
+{
+    <tr>
+        <td>@book.Title</td>
+        <td>@book.Author</td>
+        <td>@book.Genre</td>
+        <td>@book.Quantity</td>
+        <td>@book.Price</td>
+        <td>
+            @if (!currentUser.HasClaim("administrator"))
+            {
+                <a href="@Url.Content("~/admin/users/view/" + book.UniqueId)">view </a>
+                <a href="@Url.Content("~/admin/users/" + book.UniqueId)">edit </a>
+                <a href="@Url.Content("~/admin/users/" + book.UniqueId + "/delete")">delete</a>
+            }
+            @if (!currentUser.HasClaim("User"))
+            {
+                <a href="@Url.Content("~/user/sell/book/" + book.UniqueId)">sell</a>
+            }
+        </td>
+    </tr>
+}
+
+    
+</table>   

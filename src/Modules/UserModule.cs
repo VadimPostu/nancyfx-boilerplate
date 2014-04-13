@@ -27,58 +27,39 @@ namespace NancyBoilerplate.Web.Modules
             
             this.RequiresClaims(new[] { "user" });
 
-            Get["/"] = Get_Transactions;
+            Get["/"] = Redirect_To_Get_Books;
+            Get["/books"] = Get_Books;
+            Post["/sell/book/{uniqueId}"] = args => Post_SellBook(args.uniqueId); ;
 
             Get["/changePassword"] = Get_ChangePassword;
             Post["/changePassword"] = Post_ChangePassword;
 
-            Get["/transaction"] = Get_ExecuteTransaction;
-            Post["/transaction"] = Post_ExecuteTransaction;
-
-
         }
 
-        private dynamic Get_ExecuteTransaction(dynamic arg)
+        private dynamic Redirect_To_Get_Books(dynamic arg)
         {
-            return View[new TransactionViewModel()];
+            return Response.AsRedirect("~/user/books");
         }
 
-        private dynamic Post_ExecuteTransaction(dynamic arg)
+        private dynamic Post_SellBook(Guid uniqueId)
         {
-            _session.Advanced.UseOptimisticConcurrency = true;
-
-            Guid uniqueId = (Context.CurrentUser as User).UniqueId;
-            var viewModel = this.Bind<TransactionViewModel>();
-
-            User user = _session.Query<User>().Where(u => u.UniqueId == uniqueId).FirstOrDefault();
-            User receiverUser = _session.Query<User>().Where(u => u.Email == viewModel.Email).FirstOrDefault();
-
-            viewModel.AmountInvalid = viewModel.Amount <= 0;
-            viewModel.NotEnoughMoney = viewModel.Amount > user.Amount;
-            viewModel.EmailHasError = receiverUser == null;
-
-            if (viewModel.AmountInvalid || viewModel.NotEnoughMoney || viewModel.EmailHasError)
+            Book book = _session.Query<Book>().Where(q => q.UniqueId == uniqueId).FirstOrDefault();
+            if (book.Quantity > 0)
             {
-                return View[viewModel];
-            }
-
-            receiverUser.Amount += viewModel.Amount;
-            user.Amount -= viewModel.Amount;
-
-            var transaction = new Transaction(user, receiverUser, viewModel.Amount);
-            _session.Store(transaction);
-
-            try
-            {
+                book.Quantity--;
                 _session.SaveChanges();
             }
-            catch (ConcurrencyException ex)
-            {
-                viewModel.TransactionFailed = true;
-                return View[viewModel];
-            }
 
-            return Response.AsRedirect("~/user");
+            return Response.AsRedirect("~/user/books");
+        }
+
+        private dynamic Get_Books(dynamic arg)
+        {
+            var books = _session.Query<Book>()
+                .Customize(q => q.WaitForNonStaleResults())
+                .ToArray();
+
+            return View[new BookListViewModel(books)];
         }
 
         private dynamic Post_ChangePassword(dynamic arg)
@@ -106,29 +87,7 @@ namespace NancyBoilerplate.Web.Modules
         {
             return View[new ChangePasswordViewModel()];
         }
-
-        private dynamic Get_Transactions(dynamic arg)
-        {
-            Guid uniqueId = (Context.CurrentUser as User).UniqueId;
-
-            var transaction = _session.Query<Transaction>().
-                Customize(q => q.WaitForNonStaleResults()).
-                Where(t => t.Receiver.UniqueId == uniqueId || t.Sender.UniqueId == uniqueId).
-                ToArray();
-
-            return View[new TransactionListViewModel(transaction)];
-        }
-
-        public class TransactionListViewModel
-        {
-            public Transaction[] Transaction { get; set; }
-
-            public TransactionListViewModel(Transaction[] transaction)
-            {
-                Transaction = transaction ?? new Transaction[] { };
-            }
-        }
-
+        
         public class ChangePasswordViewModel
         {
             public string CurrentPassword { get; set; }
@@ -140,16 +99,14 @@ namespace NancyBoilerplate.Web.Modules
             public bool NewPasswordHasError { get; set; }
         }
 
-        public class TransactionViewModel
+        public class BookListViewModel
         {
-            public string Email { get; set; }
-            public float Amount { get; set; }
+            public Book[] Book { get; set; }
 
-            public bool EmailHasError { get; set; }
-            public bool NotEnoughMoney { get; set; }
-            public bool AmountInvalid { get; set; }
-            public bool TransactionFailed { get; set; }
+            public BookListViewModel(Book[] book)
+            {
+                Book = book ?? new Book[] { };
+            }
         }
-
     }
 }

@@ -79,15 +79,14 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\TransactionListView.cshtml" />
     <Content Include="Views\User\ChangePasswordView.cshtml" />
-    <Content Include="Views\User\TransactionView.cshtml" />
+    <Content Include="Views\User\BookListView.cshtml" />
     <None Include="Views\User\_Layout.cshtml" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
-    <Compile Include="Entities\Transaction.cs" />
+    <Compile Include="Entities\Book.cs" />
     <Compile Include="Entities\User.cs" />
     <Compile Include="Modules\AdminModule.cs" />
     <Compile Include="Modules\AuthModule.cs" />
